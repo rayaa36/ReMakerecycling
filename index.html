@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#44613B" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C1B16" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Turn everyday waste into something you'll actually use. Four guided upcycling projects with step-by-step instructions and built-in timers.">
+<title>ReMake — Turn waste into something useful</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F1EEE2; --surface:#FFFFFF; --ink:#2E2A22;
+    --leaf:#44613B; --leaf-dark:#324A2C; --soil:#5B4636; --gold:#B8862E; --line:#E2DCC9;
+    --shadow: 0 1px 2px rgba(46,42,34,0.06), 0 6px 20px rgba(46,42,34,0.07);
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1C1B16; --surface:#26241D; --ink:#EDE8D9;
+      --leaf:#8FB47E; --leaf-dark:#A7C796; --soil:#C9A581; --gold:#E0B04D; --line:#3A372C;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1C1B16; --surface:#26241D; --ink:#EDE8D9;
+    --leaf:#8FB47E; --leaf-dark:#A7C796; --soil:#C9A581; --gold:#E0B04D; --line:#3A372C;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 20px rgba(0,0,0,0.3);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600;}
+  .wrap{max-width:860px; margin:0 auto; padding:28px 20px 80px;}
+  header.top{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:28px;}
+  header.top .brand{display:flex; align-items:center; gap:10px;}
+  header.top .mark{font-size:28px;}
+  header.top h1{font-size:22px; letter-spacing:-0.01em;}
+  header.top p{margin:2px 0 0; font-size:13px; color:var(--soil);}
+
+  .theme-toggle{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; flex-shrink:0; transition:background .15s;
+  }
+  .theme-toggle:hover{background:var(--bg);}
+  .theme-toggle:focus-visible{outline:2px solid var(--leaf); outline-offset:2px;}
+
+  .intro{margin-bottom:28px;}
+  .intro h2{font-size:30px; line-height:1.15; max-width:16ch;}
+  .intro p{max-width:46ch; color:var(--soil); line-height:1.55; font-size:15px; margin-top:10px;}
+
+  .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  @media (max-width:520px){ .grid{grid-template-columns:1fr;} }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:18px; cursor:pointer; text-align:left; display:flex; flex-direction:column; gap:10px;
+    box-shadow:var(--shadow); transition:transform .15s ease;
+  }
+  .card:hover{transform:translateY(-2px);}
+  .card:focus-visible{outline:2px solid var(--leaf); outline-offset:2px;}
+  .card .card-img{width:100%; height:120px; border-radius:10px; background:var(--bg);}
+  .card .card-img svg{width:100%; height:100%;}
+  .card h3{font-size:16.5px;}
+  .card .from{font-size:12.5px; color:var(--soil);}
+  .card .progress-pill{
+    align-self:flex-start; font-size:11.5px; padding:3px 9px; border-radius:99px;
+    background:var(--bg); border:1px solid var(--line); color:var(--soil);
+  }
+  .card .progress-pill.complete{background:var(--leaf); color:#fff; border-color:var(--leaf);}
+
+  .detail{display:none;}
+  .detail.active{display:block;}
+  .home.hidden{display:none;}
+  .back{
+    background:none; border:none; color:var(--leaf); font:inherit; font-weight:600;
+    cursor:pointer; padding:0; margin-bottom:18px; display:flex; align-items:center; gap:6px; font-size:14px;
+  }
+  .back:focus-visible{outline:2px solid var(--leaf); outline-offset:2px;}
+  .detail-head{display:flex; align-items:flex-start; gap:14px; margin-bottom:6px;}
+  .detail-head .icon{font-size:38px;}
+  .detail-head h2{font-size:26px;}
+  .detail-head .result{font-size:13.5px; color:var(--soil); margin-top:4px;}
+  .detail-img{
+    width:100%; height:180px; border-radius:14px; margin:16px 0 4px;
+    box-shadow:var(--shadow); background:var(--surface);
+  }
+  .detail-img svg{width:100%; height:100%;}
+
+  .section-label{font-size:12.5px; color:var(--soil); margin:26px 0 8px; font-weight:600;}
+  .pills{display:flex; flex-wrap:wrap; gap:8px;}
+  .pills span{background:var(--surface); border:1px solid var(--line); padding:6px 11px; border-radius:99px; font-size:13px;}
+
+  .steps{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .step{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px;
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .step input[type=checkbox]{width:20px; height:20px; margin-top:2px; accent-color:var(--leaf); flex-shrink:0; cursor:pointer;}
+  .step-body{flex:1;}
+  .step-text{font-size:14.5px; line-height:1.5;}
+  .step.done .step-text{color:var(--soil); text-decoration:line-through; text-decoration-color:var(--line);}
+  .step-num{font-size:12px; color:var(--soil); font-weight:600; margin-bottom:3px;}
+
+  .wait-box{margin-top:10px; padding:10px 12px; background:var(--bg); border:1px dashed var(--line); border-radius:9px; font-size:13px;}
+  .wait-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .wait-label{color:var(--soil);}
+  .timer-display{font-family:'Inter',monospace; font-weight:600; font-size:15px; color:var(--leaf-dark); letter-spacing:0.02em;}
+  .wait-btn{background:var(--leaf); color:#fff; border:none; border-radius:8px; padding:7px 13px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit;}
+  .wait-btn:disabled{opacity:.55; cursor:default;}
+  .done-badge{color:var(--leaf-dark); font-weight:600;}
+
+  .complete-banner{
+    margin-top:22px; padding:18px 20px; border-radius:14px; text-align:center;
+    background:var(--leaf); color:#fff; animation:celebrateIn .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .complete-banner .emoji{font-size:32px; display:block; margin-bottom:6px;}
+  .complete-banner .msg{font-size:16px; font-weight:600; font-family:'Fraunces',Georgia,serif;}
+  .complete-banner .sub{font-size:13px; opacity:.85; margin-top:4px;}
+  @keyframes celebrateIn{0%{transform:scale(.9); opacity:0;} 100%{transform:scale(1); opacity:1;}}
+
+  .reset-link{margin-top:28px; background:none; border:none; color:var(--soil); font-size:12.5px; text-decoration:underline; cursor:pointer; font-family:inherit; padding:0;}
+  .reset-link:focus-visible{outline:2px solid var(--leaf); outline-offset:2px;}
+
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">♻️</span>
+      <div>
+        <h1>ReMake</h1>
+        <p>Four things to make before you throw it away</p>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <span id="themeIcon">🌙</span>
+    </button>
+  </header>
+
+  <div id="liveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <div id="home" class="home">
+    <div class="intro">
+      <h2>Your trash has a second life</h2>
+      <p>Pick one of these four everyday leftovers and follow the steps to turn it into something you'll actually use.</p>
+    </div>
+    <div class="grid" id="cardGrid" role="list" aria-label="Upcycling projects"></div>
+  </div>
+
+  <div id="detail" class="detail" role="region" aria-label="Project details">
+    <button class="back" id="backBtn">← Back to all projects</button>
+    <div class="detail-head">
+      <span class="icon" id="dIcon" aria-hidden="true"></span>
+      <div>
+        <h2 id="dTitle"></h2>
+        <div class="result" id="dResult"></div>
+      </div>
+    </div>
+
+    <div class="detail-img" id="dImage"></div>
+
+    <div class="section-label" id="materialsLabel">What you'll need</div>
+    <div class="pills" id="dMaterials" role="list" aria-labelledby="materialsLabel"></div>
+
+    <div class="section-label" id="toolsLabel">Tools</div>
+    <div class="pills" id="dTools" role="list" aria-labelledby="toolsLabel"></div>
+
+    <div class="section-label">Steps</div>
+    <ul class="steps" id="dSteps" aria-label="Project steps"></ul>
+
+    <div id="completeBanner"></div>
+
+    <button class="reset-link" id="resetBtn">Reset checklist &amp; timers for this project</button>
+  </div>
+</div>
+
+<script>
+const ILLUS = {
+  vase: `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="120" fill="var(--bg)"/>
+    <g stroke="var(--leaf)" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M72 70 C 65 55, 60 40, 68 28"/>
+      <path d="M80 70 C 80 50, 80 35, 80 22"/>
+      <path d="M88 70 C 95 55, 100 40, 92 28"/>
+    </g>
+    <circle cx="68" cy="25" r="7" fill="var(--gold)"/>
+    <circle cx="80" cy="19" r="7" fill="var(--leaf)"/>
+    <circle cx="92" cy="25" r="7" fill="var(--gold)"/>
+    <path d="M58 70 L62 108 Q80 115 98 108 L102 70 Z" fill="var(--surface)" stroke="var(--soil)" stroke-width="2.5"/>
+    <path d="M58 70 L102 70" stroke="var(--soil)" stroke-width="2.5"/>
+  </svg>`,
+  candle: `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="120" fill="var(--bg)"/>
+    <rect x="58" y="55" width="44" height="50" rx="6" fill="var(--surface)" stroke="var(--soil)" stroke-width="2.5"/>
+    <rect x="62" y="48" width="36" height="10" rx="3" fill="var(--gold)" opacity="0.5"/>
+    <line x1="80" y1="48" x2="80" y2="30" stroke="var(--soil)" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M80 10 C 86 18, 88 26, 80 32 C 72 26, 74 18, 80 10 Z" fill="var(--gold)"/>
+    <circle cx="80" cy="80" r="3" fill="var(--gold)" opacity="0.6"/>
+  </svg>`,
+  keychain: `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="120" fill="var(--bg)"/>
+    <circle cx="80" cy="68" r="30" fill="var(--surface)" stroke="var(--soil)" stroke-width="2.5"/>
+    <circle cx="68" cy="58" r="8" fill="var(--leaf)"/>
+    <circle cx="90" cy="56" r="7" fill="var(--gold)"/>
+    <circle cx="80" cy="76" r="8" fill="var(--leaf-dark)"/>
+    <circle cx="94" cy="76" r="6" fill="var(--gold)"/>
+    <circle cx="68" cy="78" r="6" fill="var(--soil)" opacity="0.5"/>
+    <circle cx="80" cy="30" r="9" fill="none" stroke="var(--soil)" stroke-width="3.5"/>
+    <line x1="80" y1="39" x2="80" y2="40" stroke="var(--soil)" stroke-width="3.5"/>
+  </svg>`,
+  compost: `<svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="160" height="120" fill="var(--bg)"/>
+    <path d="M55 45 L105 45 L98 105 Q80 112 62 105 Z" fill="var(--surface)" stroke="var(--soil)" stroke-width="2.5"/>
+    <rect x="55" y="80" width="47" height="8" fill="var(--soil)" opacity="0.35"/>
+    <rect x="57" y="65" width="45" height="8" fill="var(--gold)" opacity="0.4"/>
+    <rect x="60" y="50" width="42" height="8" fill="var(--soil)" opacity="0.25"/>
+    <path d="M80 45 C 72 35, 72 25, 80 18 C 88 25, 88 35, 80 45 Z" fill="var(--leaf)"/>
+  </svg>`
+};
+
+const DATA = [
+  {
+    id:'vase', icon:'🌱', illus:ILLUS.vase,
+    title:'Flower Vase from a Plastic Bottle',
+    result:'A little vase for fresh flowers or cuttings.',
+    materials:['Used plastic bottle','Fresh flowers or small plants','Water'],
+    tools:['Scissors or cutter','Hot glue gun or super glue','Paint / ribbon (optional)'],
+    steps:[
+      {text:"Cut the bottle into 2 parts — the top part (near the neck) and the bottom part."},
+      {text:"Flip the top part upside down, so the bottle's mouth faces downward."},
+      {text:"Glue the flipped top part onto the bottom part until it sticks firmly.", wait:{label:'Let the glue set', seconds:600}},
+      {text:"Decorate the outside of the bottle as you like (paint, ribbon, stickers, etc.)."},
+      {text:"Add a little water, then place the fresh flowers inside."}
+    ]
+  },
+  {
+    id:'candle', icon:'🕯️', illus:ILLUS.candle,
+    title:'Aromatherapy Candle from Used Cooking Oil',
+    result:'A scented candle made from oil you were going to throw out.',
+    materials:['Used cooking oil','Charcoal','Palm wax (1:1 with the oil)','Candle wick','Candle dye','Essential oil'],
+    tools:['Soaking container','Strainer','2 heat-resistant containers (double boiler)','Stove','Candle mold'],
+    steps:[
+      {text:"Soak the used cooking oil with charcoal overnight — this absorbs odor and impurities from the oil.", wait:{label:'Soak overnight', seconds:28800}},
+      {text:"Strain the oil until it's clean from any leftover charcoal."},
+      {text:"Prepare palm wax and the strained oil at a 1:1 ratio — e.g. 100g palm wax + 100g used oil."},
+      {text:"Heat water in one container, then place a second container with the palm wax + oil on top of it (double boiler method, to prevent burning)."},
+      {text:"Stir until the palm wax melts completely and blends evenly with the oil."},
+      {text:"Remove from heat, then add candle dye and essential oil to taste, and stir well."},
+      {text:"Place the wick in the center of the mold, then pour the melted mixture in."},
+      {text:"Let it sit until completely hardened.", wait:{label:'Let it harden', seconds:14400}}
+    ]
+  },
+  {
+    id:'keychain', icon:'🔑', illus:ILLUS.keychain,
+    title:'Keychain from Bottle Caps',
+    result:'A small, sturdy keychain fused from melted caps.',
+    materials:['Used bottle caps (several colors)','Keychain ring'],
+    tools:['Small cookie cutter (as a mold)','Baking paper','Iron'],
+    steps:[
+      {text:"Prepare a small cookie cutter, baking paper, and a heated iron."},
+      {text:"Cut the bottle caps into small pieces."},
+      {text:"Arrange the pieces in a circle inside the cutter, on top of the baking paper."},
+      {text:"Cover with baking paper, then iron over it until the pieces melt and fuse together."},
+      {text:"Remove the baking paper and quickly shape it while it's still hot and flexible — be careful, it's hot."},
+      {text:"Once cooled and hardened, trim the edges neatly with scissors.", wait:{label:'Let it cool', seconds:300}},
+      {text:"Attach a keychain ring to one side."}
+    ]
+  },
+  {
+    id:'compost', icon:'🌿', illus:ILLUS.compost,
+    title:'Compost from Organic Waste',
+    result:'Nutrient-rich soil for your plants, made from kitchen scraps.',
+    materials:['Soil','Brown material (dry leaves / rice husks)','Organic kitchen waste (veg/fruit scraps)'],
+    tools:['Container or bucket with holes','Small shovel'],
+    steps:[
+      {text:"Prepare a container or bucket, with a few small holes on the sides or bottom for airflow."},
+      {text:"Fill the bottom layer with soil."},
+      {text:"Add a layer of brown material (dry leaves or rice husks) — this is the carbon source."},
+      {text:"Add a layer of organic kitchen waste — this is the nitrogen source."},
+      {text:"Cover with another layer of soil on top."},
+      {text:"Let it sit and stir the contents once a week — this helps oxygen circulate and prevents odor.", wait:{label:'Minimum 2 weeks', seconds:1209600}}
+    ]
+  }
+];
+
+const STORE_KEY = 'remake-progress-v1';
+const THEME_KEY = 'remake-theme';
+let store = {};
+try { store = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e) { store = {}; }
+function saveStore(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch(e){} }
+function getProject(id){ if(!store[id]) store[id] = { checked:{}, timers:{} }; return store[id]; }
+
+const liveRegion = document.getElementById('liveRegion');
+function announce(msg){ liveRegion.textContent=''; requestAnimationFrame(()=>{ liveRegion.textContent = msg; }); }
+
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  try { localStorage.setItem(THEME_KEY, theme); } catch(e){}
+}
+(function(){
+  let saved; try { saved = localStorage.getItem(THEME_KEY); } catch(e){}
+  if(saved==='dark'||saved==='light') applyTheme(saved);
+  else if(window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+  else applyTheme('light');
+})();
+themeToggle.addEventListener('click', ()=>{
+  const next = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  applyTheme(next); announce('Switched to ' + next + ' mode');
+});
+
+function fmt(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  const d = Math.floor(s/86400), h = Math.floor((s%86400)/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if(d>0) return d+'d '+h+'h '+m+'m';
+  if(h>0) return h+'h '+m+'m '+sec+'s';
+  if(m>0) return m+'m '+sec+'s';
+  return sec+'s';
+}
+
+const cardGrid = document.getElementById('cardGrid');
+const home = document.getElementById('home');
+const detail = document.getElementById('detail');
+
+function projectDoneCount(p){ return p.steps.filter((_,i)=> getProject(p.id).checked[i]).length; }
+function isProjectComplete(p){ return projectDoneCount(p) === p.steps.length; }
+
+function renderHome(){
+  cardGrid.innerHTML = '';
+  DATA.forEach(p=>{
+    const done = projectDoneCount(p), total = p.steps.length, complete = done===total;
+    const card = document.createElement('button');
+    card.className = 'card';
+    card.setAttribute('role','listitem');
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'card-img';
+    imgWrap.innerHTML = p.illus;
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'icon'; iconSpan.setAttribute('aria-hidden','true'); iconSpan.textContent = p.icon;
+
+    const h3 = document.createElement('h3'); h3.textContent = p.title;
+    const fromSpan = document.createElement('span'); fromSpan.className='from'; fromSpan.textContent = p.result;
+    const pill = document.createElement('span');
+    pill.className = 'progress-pill' + (complete ? ' complete' : '');
+    pill.textContent = complete ? '✓ Complete' : done + ' / ' + total + ' steps';
+
+    card.append(imgWrap, h3, fromSpan, pill);
+    card.addEventListener('click', ()=> openProject(p.id));
+    cardGrid.appendChild(card);
+  });
+}
+
+let activeTimerInterval = null;
+let activeTimerCallbacks = [];
+function startTimerDispatcher(){
+  stopTimerDispatcher();
+  activeTimerInterval = setInterval(()=>{ activeTimerCallbacks.forEach(cb=>cb.tick()); }, 1000);
+}
+function stopTimerDispatcher(){
+  if(activeTimerInterval){ clearInterval(activeTimerInterval); activeTimerInterval = null; }
+  activeTimerCallbacks = [];
+}
+
+const CELEBRATE = [
+  {emoji:'🎉', msg:'Project complete!', sub:'You just turned trash into treasure.'},
+  {emoji:'🌟', msg:'All steps done!', sub:'Another piece of waste saved from the landfill.'},
+  {emoji:'♻️', msg:'Nicely done!', sub:'The planet thanks you.'},
+  {emoji:'🏆', msg:"You're a maker!", sub:'One less thing in the garbage.'}
+];
+function renderCompleteBanner(p){
+  const banner = document.getElementById('completeBanner');
+  banner.innerHTML = '';
+  if(isProjectComplete(p)){
+    const c = CELEBRATE[DATA.indexOf(p) % CELEBRATE.length];
+    const div = document.createElement('div'); div.className='complete-banner';
+    const emoji = document.createElement('span'); emoji.className='emoji'; emoji.setAttribute('aria-hidden','true'); emoji.textContent=c.emoji;
+    const msg = document.createElement('div'); msg.className='msg'; msg.textContent=c.msg;
+    const sub = document.createElement('div'); sub.className='sub'; sub.textContent=c.sub;
+    div.append(emoji,msg,sub); banner.appendChild(div);
+    announce(c.msg + ' ' + c.sub);
+  }
+}
+
+let currentProject = null;
+function openProject(id){
+  const p = DATA.find(x=>x.id===id);
+  currentProject = p;
+  home.classList.add('hidden');
+  detail.classList.add('active');
+
+  document.getElementById('dIcon').textContent = p.icon;
+  document.getElementById('dTitle').textContent = p.title;
+  document.getElementById('dResult').textContent = p.result;
+  document.getElementById('dImage').innerHTML = p.illus;
+
+  const mats = document.getElementById('dMaterials'); mats.innerHTML = '';
+  p.materials.forEach(m=>{ const s=document.createElement('span'); s.setAttribute('role','listitem'); s.textContent=m; mats.appendChild(s); });
+
+  const tools = document.getElementById('dTools'); tools.innerHTML = '';
+  p.tools.forEach(t=>{ const s=document.createElement('span'); s.setAttribute('role','listitem'); s.textContent=t; tools.appendChild(s); });
+
+  const list = document.getElementById('dSteps'); list.innerHTML = '';
+  stopTimerDispatcher();
+  const proj = getProject(p.id);
+
+  p.steps.forEach((step, i)=>{
+    const li = document.createElement('li'); li.className = 'step' + (proj.checked[i] ? ' done' : '');
+    const cb = document.createElement('input'); cb.type='checkbox'; cb.id='chk-'+p.id+'-'+i; cb.checked = !!proj.checked[i];
+    const label = document.createElement('label'); label.setAttribute('for', cb.id); label.className='sr-only'; label.textContent='Mark step '+(i+1)+' as done';
+
+    const body = document.createElement('div'); body.className='step-body';
+    const num = document.createElement('div'); num.className='step-num'; num.textContent='Step '+(i+1);
+    const text = document.createElement('div'); text.className='step-text'; text.textContent=step.text;
+    body.append(num, text);
+
+    if(step.wait){
+      const waitBox = document.createElement('div'); waitBox.className='wait-box';
+      const row = document.createElement('div'); row.className='wait-row';
+      const wLabel = document.createElement('span'); wLabel.className='wait-label'; wLabel.textContent=step.wait.label+':';
+      const display = document.createElement('span'); display.className='timer-display'; display.id='timer-'+p.id+'-'+i;
+      display.setAttribute('role','timer'); display.textContent='Not started';
+      const btn = document.createElement('button'); btn.className='wait-btn'; btn.id='start-'+p.id+'-'+i; btn.textContent='Start timer';
+      row.append(wLabel, display, btn); waitBox.appendChild(row); body.appendChild(waitBox);
+      setupTimer(p.id, i, step.wait.seconds, display, btn);
+    }
+
+    li.append(cb, label, body);
+    list.appendChild(li);
+
+    cb.addEventListener('change', ()=>{
+      proj.checked[i] = cb.checked;
+      li.classList.toggle('done', cb.checked);
+      saveStore();
+      renderCompleteBanner(p);
+      announce(cb.checked ? 'Step '+(i+1)+' completed. '+projectDoneCount(p)+' of '+p.steps.length+' done.' : 'Step '+(i+1)+' unchecked.');
+    });
+  });
+
+  if(activeTimerCallbacks.length > 0) startTimerDispatcher();
+  renderCompleteBanner(p);
+  announce('Opened project: ' + p.title);
+  window.scrollTo(0, 0);
+}
+
+function setupTimer(pid, i, totalSeconds, display, btn){
+  const proj = getProject(pid);
+  function tick(){
+    const rec = proj.timers[i];
+    if(!rec){ display.textContent='Not started'; btn.textContent='Start timer'; btn.disabled=false; return; }
+    const remaining = rec.endsAt - Date.now();
+    if(remaining <= 0){
+      display.textContent = '✅ Done waiting';
+      display.classList.add('done-badge');
+      btn.textContent = 'Restart timer'; btn.disabled = false;
+      if(!rec.announced){ rec.announced = true; saveStore(); announce('Timer done for step '+(i+1)); }
+    } else {
+      display.textContent = fmt(remaining) + ' left';
+      btn.textContent = 'Restart timer'; btn.disabled = false;
+    }
+  }
+  btn.addEventListener('click', ()=>{
+    proj.timers[i] = { endsAt: Date.now() + totalSeconds*1000 };
+    saveStore(); tick();
+    announce('Timer started: ' + fmt(totalSeconds*1000));
+  });
+  tick();
+  activeTimerCallbacks.push({ tick });
+}
+
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  stopTimerDispatcher();
+  detail.classList.remove('active');
+  home.classList.remove('hidden');
+  currentProject = null;
+  renderHome();
+  announce('Returned to project list');
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(currentProject){
+    store[currentProject.id] = { checked:{}, timers:{} };
+    saveStore();
+    openProject(currentProject.id);
+    announce('Reset all progress for ' + currentProject.title);
+  }
+});
+
+renderHome();
+</script>
+</body>
+</html>
